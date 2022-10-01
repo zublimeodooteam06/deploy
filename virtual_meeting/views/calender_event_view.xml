@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+        <record model="ir.ui.view" id="virtual_meeting_calender_event_form">
+            <field name="name">virtual.meeting.calender.event.form</field>
+            <field name="model">calendar.event</field>
+            <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+            <field name="arch" type="xml">
+                    <xpath expr="/form/*"  position="before">
+                        <header attrs="{'invisible': [('isOnline', '=', False)]}">
+                            <field name="recording_url" invisible="1"/>
+                            <button string="View recording" class="btn btn-warning" name="download_recording" type="object" attrs="{'invisible': ['|',('recording_url', '=', ''), ('state', '!=', 'done')]}"/>
+                            <button string="Start Meeting" class="btn btn-info" name="create_meeting" type="object" states="draft"/>
+                            <button string="Join Link" class="btn btn-success" name="join_meeting_url"  type="object" states="in_progress"/>
+                            <button string="End Meeting" class="btn btn-danger" name="delete_meeting" type="object" states="in_progress"/>
+                        </header>
+                    </xpath>
+                    <xpath expr="//div[@class='oe_title']/h1" position="after">
+                        <label for="isMultipleModerators"/>
+                        <field name="isMultipleModerators" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        <div name="isCheck" attrs="{'invisible': [('isMultipleModerators', '!=', False)]}">
+                            <label for="user_id" string="Moderator" class="oe_edit_only"/>
+                            <h1>
+                                <field name="user_id" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </h1>
+                        </div>
+                        <div attrs="{'invisible': [('isMultipleModerators', '=', False)]}">
+                            <label for="user_ids" string="Moderators" class="oe_edit_only"/>
+                            <h2>
+                                <field name="user_ids" widget="many2manyattendee" placeholder="Select moderators..." class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </h2>
+                        </div>
+                    </xpath>
+                    <xpath expr="//field[@name='partner_ids']" position="replace">
+                        <field name="partner_ids" widget="many2manyattendee" placeholder="Select attendees..."
+                                context="{'force_email':True}" class="oe_inline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    </xpath>
+                    <xpath expr="//notebook" position="before">
+                        <label for="isOnline"/>
+                        <field name="isOnline" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    </xpath>
+                    <xpath expr="//notebook" position="inside">
+                        <page string="Virtual Meeting" attrs="{'invisible': [('isOnline', '=', False)]}">
+                            <group string="General Settings">
+                                <group col="1">
+                                <field name="meetingID" invisible="1"/>
+                                <field name="welcome" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="moderatorOnlyMessage" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="maxParticipants" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="send_mail" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                </group>
+                            </group>
+                            <group string="Guest">
+                                <group col="1">
+                                    <field name="inviteGuestModerator" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="inviteGuestAttendee" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                </group>
+                                <group col="1">
+                                    <t t-if="inviteGuestModerator">
+                                        <field name="joinGuestModerator" widget="CopyClipboardChar" readonly="True" attrs="{'invisible': [('inviteGuestModerator', '=', False)]}"/>
+                                    </t>
+                                    <t t-if="inviteGuestAttendee">
+                                        <field name="joinGuestAttendee" widget="CopyClipboardChar" readonly="True"  attrs="{'invisible': [('inviteGuestAttendee', '=', False)]}"/>
+                                    </t>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Recordings" col="1">
+                                    <field name="allowStartStopRecording" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="autoStartRecording" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                </group>
+                                <group string="Media" col="1">
+                                    <field name="webcamsOnlyForModerator" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="muteOnStart" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="allowModsToUnmuteUsers" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                    <field name="lockSettingsDisableMic" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="kanban">
+            <field name="name">uml.online.class.kanban</field>
+            <field name="model">calendar.event</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="start_datetime"/>
+                    <field name="duration"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                    <field name="user_id"/>
+                    <field name="user_ids"/>
+                    <field name="isMultipleModerators"/>
+                        <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                                    <div class="ce_ribbon ce_ribbon-top-right o_widget" attrs="{'invisible': [('state', '!=', 'done')]}">
+                                        <span class="bg-success" states="done">Meeting Ended</span>
+                                    </div>
+                                <div class="oe_kanban_details d-flex flex-column">
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <strong style="color:darkgoldenrod" class="o_kanban_record_title oe_partner_heading limit_content"><field name="name"/></strong>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <button class="btn btn-info cv_btn" name="create_meeting" type="object" states="draft">Start Meeting</button>
+                                        <button class="btn btn-success cv_btn" name="join_meeting_url" type="object" states="in_progress">Join Meeting</button>
+                                        <button class="btn btn-danger cv_btn" name="delete_meeting" type="object" states="in_progress">End Meeting</button>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <span style="font-weight:bold"><t t-esc="record.start_datetime.value"/></span>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+<!--                                        <button class="btn btn-success cv_btn" name="join_meeting_url" type="object" states="in_progress">Guest Moderator</button>-->
+<!--                                        <button class="btn btn-info cv_btn" name="create_meeting" type="object" states="in_progress">Guest Attendee</button>-->
+                                    </div>
+                                </div>
+                                    <div class="o_kanban_record_bottom mt-auto d-flex justify-content-between align-items-end">
+                                        <span>
+                                            <i class="fa fa-clock-o mr-2"  aria-label="Duration" role="img" title="Duration"/><field name="duration" widget="float_time" string="Duration"/> Hours
+                                        </span>
+                                        <div class="o_kanban_record_bottom">
+
+                                        <t t-if="record.isMultipleModerators.raw_value">
+                                            <t t-set="check" t-value="0"/>
+                                            <t t-foreach="record.user_ids.raw_value" t-as="i">
+                                                <t t-set="check" t-value="check + 1"/>
+                                                <t t-if="check == 5">
+                                                    <p> ...</p>
+                                                </t>
+                                                <t t-elif="check &lt; 5">
+                                                    <img t-att-src="kanban_image('res.users', 'image_128', i)" t-att-title="i.value" t-att-alt="i" class="oe_kanban_avatar o_image_24_cover" style="width: 20px;height: 20px;border-radius: 50%;"/>
+                                                </t>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <img t-att-src="kanban_image('res.users', 'image_128', record.user_id.raw_value)" t-att-title="record.user_id.value" t-att-alt="record.user_id.value" class="oe_kanban_avatar o_image_24_cover" style="width: 20px;height: 20px;border-radius: 50%;"/>
+                                        </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="virtual_meeting_calender_event">
+            <field name="name">Virtual Meeting</field>
+            <field name="res_model">calendar.event</field>
+            <field name="view_mode">kanban,tree,calendar,form</field>
+            <field name="context">{'default_isOnline': 'True'}</field>
+            <field name="domain">[('isOnline', '=', 'True')]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create first virtual meeting
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="main_virtual_meeting_calender_event" name="Virtual Meeting"/>
+        <menuitem id="sub_main_virtual_meeting_calender_event" name="Meeting"
+                  parent="main_virtual_meeting_calender_event"
+                  action="virtual_meeting_calender_event"/>
+</odoo>

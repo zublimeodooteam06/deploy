@@ -1,0 +1,23 @@
+<odoo>
+    <template id="virtual_meeting_ribbon_backend" name="Backend Assets (used in backend interface)" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/virtual_meeting/static/scss/ribbon.scss"/>
+        </xpath>
+    </template>
+
+    <data noupdate="1">
+        <record id="calendar_event_mail_attendee" model="mail.template">
+            <field name="name">Mail Attendees</field>
+            <field name="model_id" ref="model_calendar_event"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <record id="calendar_event_mail_moderator" model="mail.template">
+            <field name="name">Mail Moderator</field>
+            <field name="model_id" ref="model_calendar_event"/>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record model="ir.cron" id="calendar_event_meeting_end_check">
+            <field name="name">Auto check InProgress State</field>
+            <field name="model_id" ref="model_calendar_event"/>
+            <field name="state">code</field>
+            <field name="code">model.meeting_running()</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>hours</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
+    <data noupdate="0">
+        <record model="ir.cron" id="calendar_event_recording_ready_check">
+            <field name="name">Auto check Recording Ready</field>
+            <field name="model_id" ref="model_calendar_event"/>
+            <field name="state">code</field>
+            <field name="code">model.recording_ready()</field>
+            <field name='interval_number'>5</field>
+            <field name='interval_type'>minutes</field>
+            <field name="numbercall">-1</field>
+        </record>
+    </data>
+</odoo>
